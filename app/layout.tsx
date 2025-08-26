@@ -7,7 +7,11 @@ export const metadata: Metadata = {
   description: "3秒返し MVP",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="ja">
       <body>{children}</body>
