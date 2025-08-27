@@ -500,58 +500,68 @@ function HomeView({
   );
 }
 
-// どこか共通の場所（型定義群の近く）に追加
+/* ===== Tabs 型 ===== */
 type Tab = "home" | "prompts" | "vote" | "cards" | "leaderboard";
 
-// ====== ヘッダー ======
-function Header({ appName, user, onLogin, onLogout, onTabChange, tab, isAdmin, onShowAdmin }:{
+/* ===== Header Props 型 ===== */
+type HeaderProps = {
   appName: string;
   user: UserProfile | null;
   onLogin: (u: UserProfile) => void;
   onLogout: () => void;
-// App 内
-const [tab, setTab] = useState<Tab>("home");
-
-// Header の props 型
-function Header({ appName, user, onLogin, onLogout, onTabChange, tab, isAdmin, onShowAdmin }: {
-  appName: string;
-  user: UserProfile | null;
-  onLogin: (u: UserProfile) => void;
-  onLogout: () => void;
-  onTabChange: (t: Tab) => void; // ← 修正
-  tab: Tab;                      // ← 修正
+  onTabChange: (t: Tab) => void; // ← any をやめて Tab に
+  tab: Tab;                      // ← any をやめて Tab に
   isAdmin: boolean;
   onShowAdmin: () => void;
-}) { /* ... */ }
+};
 
-// HomeView の props も合わせる
-function HomeView({ prompts, onPickPrompt, go }: {
-  prompts: Prompt[];
-  onPickPrompt: (p: Prompt) => void;
-  go: (t: Tab) => void; // ← 修正
-}) { /* ... */ }
-
-  tab: string;
-  isAdmin: boolean;
-  onShowAdmin: () => void;
-}){
+/* ===== Header 本体 ===== */
+function Header({
+  appName,
+  user,
+  onLogin,
+  onLogout,
+  onTabChange,
+  tab,
+  isAdmin,
+  onShowAdmin,
+}: HeaderProps) {
   const [open, setOpen] = useState(false);
   const [handle, setHandle] = useState(user?.handle ?? "");
+
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur border-b border-amber-100/60 text-amber-950">
       <div className="mx-auto max-w-6xl px-4 py-3 flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <img src={LOGO_PNG} alt="OwarAI" className="w-7 h-7 rounded-full" />
+          {/* next/image に変更して最適化＆ESLint警告回避 */}
+          <Image
+            src={LOGO_PNG}
+            alt="OwarAI"
+            width={28}
+            height={28}
+            className="rounded-full"
+            priority
+          />
           <span className="font-extrabold tracking-tight">{appName}</span>
           <Badge className="ml-2">β</Badge>
         </div>
 
         <nav className="ml-6 hidden md:flex items-center gap-2 text-sm">
-          <NavButton active={tab === "home"} onClick={() => onTabChange("home")}>ホーム</NavButton>
-          <NavButton active={tab === "prompts"} onClick={() => onTabChange("prompts")}>お題</NavButton>
-          <NavButton active={tab === "vote"} onClick={() => onTabChange("vote")}>投票</NavButton>
-          <NavButton active={tab === "cards"} onClick={() => onTabChange("cards")}>結果カード</NavButton>
-          <NavButton active={tab === "leaderboard"} onClick={() => onTabChange("leaderboard")}>リーグ</NavButton>
+          <NavButton active={tab === "home"} onClick={() => onTabChange("home")}>
+            ホーム
+          </NavButton>
+          <NavButton active={tab === "prompts"} onClick={() => onTabChange("prompts")}>
+            お題
+          </NavButton>
+          <NavButton active={tab === "vote"} onClick={() => onTabChange("vote")}>
+            投票
+          </NavButton>
+          <NavButton active={tab === "cards"} onClick={() => onTabChange("cards")}>
+            結果カード
+          </NavButton>
+          <NavButton active={tab === "leaderboard"} onClick={() => onTabChange("leaderboard")}>
+            リーグ
+          </NavButton>
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
@@ -604,8 +614,13 @@ function HomeView({ prompts, onPickPrompt, go }: {
                   </div>
                   <Button
                     onClick={() => {
-                      const id = user?.id ?? `u-${(crypto?.randomUUID?.() || Math.random().toString(36)).slice(0,8)}`;
-                      const h  = (handle.trim() || `user${Math.floor(Math.random()*999)}`);
+                      const id =
+                        user?.id ??
+                        `u-${(typeof crypto !== "undefined" && crypto.randomUUID
+                          ? crypto.randomUUID()
+                          : Math.random().toString(36).slice(2, 10)
+                        ).slice(0, 8)}`;
+                      const h = handle.trim() || `user${Math.floor(Math.random() * 999)}`;
                       onLogin({ id, handle: h });
                       setOpen(false);
                     }}
@@ -623,13 +638,6 @@ function HomeView({ prompts, onPickPrompt, go }: {
   );
 }
 
-function NavButton({ children, active, onClick }:{ children: React.ReactNode; active?: boolean; onClick?: () => void; }){
-  return (
-    <button onClick={onClick} className={`px-3 py-1.5 rounded-full ${active ? "bg-amber-900 text-amber-50" : "text-amber-900 hover:bg-amber-200"}`}>
-      {children}
-    </button>
-  );
-}
 
 // ====== 管理パネル（運営専用。プレビューでは未使用） ======
 function AdminPanel({ open, onClose, onCreate, defaultWeek = 1, existing }:{
