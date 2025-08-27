@@ -233,7 +233,15 @@ function VideoOrLogo({ onEnd }: { onEnd: () => void }) {
       {!videoReady && (
         <motion.div aria-hidden className="absolute inset-0 flex items-center justify-center" initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: [0.6, 1.08, 1], opacity: [0, 1, 1], rotate: [0, -2, 0] }} transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }} style={{ filter: "drop-shadow(0 10px 20px rgba(0,0,0,.15))" }}>
           <div className="relative">
-            <img src={LOGO_PNG} alt="OwarAI logo" className="w-[min(70vw,520px)] h-auto" />
+           <Image
+  src={LOGO_PNG}
+  alt="OwarAI logo"
+  width={520}
+  height={520}
+  className="w-[min(70vw,520px)] h-auto"
+  sizes="(max-width: 768px) 70vw, 520px"
+  priority
+/>
             <motion.div className="pointer-events-none absolute inset-0" initial={{ x: "-120%" }} animate={{ x: ["-120%", "130%"] }} transition={{ duration: 1.2, delay: 0.3, ease: "easeInOut" }} style={{ background: "linear-gradient(105deg, rgba(255,255,255,0) 30%, rgba(255,255,255,.55) 48%, rgba(255,255,255,0) 66%)", mixBlendMode: "soft-light" }} />
           </div>
         </motion.div>
@@ -492,13 +500,37 @@ function HomeView({
   );
 }
 
+// どこか共通の場所（型定義群の近く）に追加
+type Tab = "home" | "prompts" | "vote" | "cards" | "leaderboard";
+
 // ====== ヘッダー ======
 function Header({ appName, user, onLogin, onLogout, onTabChange, tab, isAdmin, onShowAdmin }:{
   appName: string;
   user: UserProfile | null;
   onLogin: (u: UserProfile) => void;
   onLogout: () => void;
-  onTabChange: (t: any) => void;
+// App 内
+const [tab, setTab] = useState<Tab>("home");
+
+// Header の props 型
+function Header({ appName, user, onLogin, onLogout, onTabChange, tab, isAdmin, onShowAdmin }: {
+  appName: string;
+  user: UserProfile | null;
+  onLogin: (u: UserProfile) => void;
+  onLogout: () => void;
+  onTabChange: (t: Tab) => void; // ← 修正
+  tab: Tab;                      // ← 修正
+  isAdmin: boolean;
+  onShowAdmin: () => void;
+}) { /* ... */ }
+
+// HomeView の props も合わせる
+function HomeView({ prompts, onPickPrompt, go }: {
+  prompts: Prompt[];
+  onPickPrompt: (p: Prompt) => void;
+  go: (t: Tab) => void; // ← 修正
+}) { /* ... */ }
+
   tab: string;
   isAdmin: boolean;
   onShowAdmin: () => void;
