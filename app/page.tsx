@@ -1,5 +1,7 @@
 "use client";
 import React, { useEffect, useMemo, useState, useRef } from "react";
+import Image from "next/image";
+import type { PanInfo } from "framer-motion";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Sparkles,
@@ -898,7 +900,14 @@ function VoteView({ user }: { user: UserProfile | null }){
 
   const nextCard = (excludeId?: number) => { const rest = excludeId ? queue.filter((s) => s.id !== excludeId) : queue.slice(1); setQueue(rest); setCurrent(rest[0] || null); setDragX(0); };
   const commitVote = (score: 1 | 2 | 3) => { if (!user || !current) return; castVote({ submissionId: current.id, voterId: user.id, score }); toast.show(`投票しました：${score} 点`); nextCard(current.id); };
-  const onDragEnd = (_: any, info: { offset: { x: number } }) => { if (!current) return; if (!user) { alert("先にログインしてください"); setDragX(0); return; } const x = info.offset.x; if (x > THRESHOLD) commitVote(3); else if (x < -THRESHOLD) commitVote(1); else commitVote(2); };
+  const onDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+  const x = info.offset.x;
+  if (!current) return;
+  if (!user) { alert("先にログインしてください"); setDragX(0); return; }
+  if (x > THRESHOLD) commitVote(3);
+  else if (x < -THRESHOLD) commitVote(1);
+  else commitVote(2);
+};
 
   if (!current) {
     return (
@@ -935,7 +944,15 @@ function VoteView({ user }: { user: UserProfile | null }){
               </div>
 
               {/* ドラッグ対象（本文） */}
-              <motion.div drag="x" onDrag={(_, info) => setDragX(info.offset.x)} onDragEnd={onDragEnd} dragSnapToOrigin className="cursor-grab active:cursor-grabbing">
+            <motion.div
+  drag="x"
+  onDrag={(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => setDragX(info.offset.x)}
+  onDragEnd={onDragEnd}
+  dragSnapToOrigin
+  className="cursor-grab active:cursor-grabbing"
+>
+  {/* ... */}
+</motion.div>
                 <div className="flex items-center gap-2 text-xs text-amber-900/70"><span>予測スコア：{current.ruleScore}</span></div>
                 <div className="mt-4 text-lg leading-relaxed select-none">{current.content}</div>
               </motion.div>
