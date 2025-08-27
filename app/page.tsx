@@ -177,7 +177,10 @@ function useToast(){
 }
 
 // ====== 擬似バックエンド ======
-let _submissions: Submission[] = []; let _votes: Vote[] = []; let idCounter = 1000;
+const _submissions: Submission[] = []; // ← let を const に
+let _votes: Vote[] = [];               // ← これは再代入しているので let のまま
+let idCounter = 1000;
+
 
 function seedDemo(){ if (_submissions.length>0) return; const ai={ id:"ai-sample", handle:"AIサンプル" };
   const samples: Array<{p:number; family:Family; text:string}> = [
@@ -943,26 +946,33 @@ function VoteView({ user }: { user: UserProfile | null }){
                 <div className="rotate-[12deg] rounded-xl border border-amber-300 bg-amber-50 px-3 py-1 text-sm text-amber-900 shadow">🔥 3</div>
               </div>
 
-              {/* ドラッグ対象（本文） */}
-            <motion.div
+{/* ドラッグ対象（本文） */}
+<motion.div
   drag="x"
-  onDrag={(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => setDragX(info.offset.x)}
+  onDrag={(_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    setDragX(info.offset.x);
+  }}
   onDragEnd={onDragEnd}
   dragSnapToOrigin
   className="cursor-grab active:cursor-grabbing"
 >
-  {/* ... */}
+  <div className="flex items-center gap-2 text-xs text-amber-900/70">
+    <span>予測スコア：{current.ruleScore}</span>
+  </div>
+  <div className="mt-4 text-lg leading-relaxed select-none">
+    {current.content}
+  </div>
 </motion.div>
-                <div className="flex items-center gap-2 text-xs text-amber-900/70"><span>予測スコア：{current.ruleScore}</span></div>
-                <div className="mt-4 text-lg leading-relaxed select-none">{current.content}</div>
-              </motion.div>
 
-              {/* タップでも採点 */}
-              <div className="mt-6 grid grid-cols-3 gap-2">
-                <Button variant="outline" onClick={() => commitVote(1)}>😐 1</Button>
-                <Button variant="outline" onClick={() => commitVote(2)}>🙂 2</Button>
-                <Button onClick={() => commitVote(3)}><Flame className="w-4 h-4" />3</Button>
-              </div>
+{/* タップでも採点 */}
+<div className="mt-6 grid grid-cols-3 gap-2">
+  <Button variant="outline" onClick={() => commitVote(1)}>{"😐 1"}</Button>
+  <Button variant="outline" onClick={() => commitVote(2)}>{"🙂 2"}</Button>
+  <Button onClick={() => commitVote(3)}>
+    <Flame className="w-4 h-4" />
+    3
+  </Button>
+</div>
 
               <p className="mt-3 text-xs text-amber-900/70">ヒント：左へスワイプ=1 / タップ=2 / 右へスワイプ=3 ・ キー= 1/2/3・←/→・Space</p>
             </Card>
