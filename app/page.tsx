@@ -896,7 +896,7 @@ function VoteView({ user }: { user: UserProfile | null }){
   useEffect(() => { const q = listOthersForVoting(user?.id || "guest"); setQueue(q); setCurrent(q[0] || null); }, [user?.id, _submissions.length, _votes.length]);
 
   useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (!current) return; if (!user) { alert("先にログインしてください"); return; } if (e.key === "1" || e.key === "ArrowLeft") commitVote(1); else if (e.key === "2" || e.key === " " || (e as any).key === "Spacebar") commitVote(2); else if (e.key === "3" || e.key === "ArrowRight") commitVote(3); };
+    const onKey = (e: KeyboardEvent) => { if (!current) return; if (!user) { alert("先にログインしてください"); return; } if (e.key === "1" || e.key === "ArrowLeft") commitVote(1); else if (e.key === "2" || e.key === " " || e.key === "Spacebar") commitVote(2); else if (e.key === "3" || e.key === "ArrowRight") commitVote(3); };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [user?.id, current?.id]);
