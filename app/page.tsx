@@ -19,6 +19,30 @@ import {
   Tag,
 } from "lucide-react";
 
+function NavButton({
+  children,
+  active = false,
+  onClick,
+}: {
+  children: React.ReactNode;
+  active?: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-3 py-1.5 rounded-full transition-colors ${
+        active
+          ? "bg-amber-900 text-amber-50"
+          : "text-amber-900 hover:bg-amber-200"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+
 /**
  * OwarAI – 3秒返し MVP（ブランド版）
  * - ユーザーによるお題追加は不可（運営のみ）。このプレビューでは常に無効化。
